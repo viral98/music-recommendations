@@ -1,0 +1,31 @@
+{
+  "name": "music-recommendations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viral98/music-recommendations.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/viral98/music-recommendations/issues"
+  },
+  "homepage": "https://github.com/viral98/music-recommendations#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.1",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint": "^8.10.0",
+    "eslint-plugin-react": "^7.29.2",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
