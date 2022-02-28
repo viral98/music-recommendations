@@ -41,11 +41,6 @@ function getRatedItemsForUser(ratings, userIndex, numItems) {
     }
     return ratedItems;
 }
-function typeCheckRatings(ratings) {
-    if (!Array.isArray(ratings)) {
-        throw new TypeError('The ratings and coMatrix field should be an array of arrays (matrix)');
-    }
-}
 function typeCheckUserIndex(userIndex, ratings) {
     if (!Number.isInteger(userIndex)) {
         throw new TypeError('The field userIndex should be an integer');
@@ -74,7 +69,6 @@ function checkRatingValues(ratingMatrix) {
  * the item is.
  */
 function getRecommendations(ratings, coMatrix, userIndex) {
-    typeCheckRatings(ratings);
     let ratingsMatrix;
     try {
         ratingsMatrix = math.matrix(ratings);
@@ -123,9 +117,6 @@ function getRecommendations(ratings, coMatrix, userIndex) {
  * diagonal from left to right should consist of only zeroes.
  */
 function createCoMatrix(ratings) {
-    // We create the ratings matrix to ensure we have correct dimensions
-    console.log(math);
-    typeCheckRatings(ratings);
     let ratingsMatrix;
     try {
         ratingsMatrix = math.matrix(ratings);

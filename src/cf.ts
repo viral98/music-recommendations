@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const math = require('mathjs');
 
-
+type InputMatrix = typeof math.Matrix
 /*
   * If you put this to 0, you will get recommendations from users which don't necessarily have
   * similar taste as you (these will however be lower ranked than recommendations from people
@@ -21,7 +21,7 @@ const NORMALIZE_ON_POPULARITY = 1;
  * coMatrix. Should be the same size as coMatrix
  * @returns {mathjs matrix} A normalized co-occurrence matrix
  */
-function normalizeCoMatrix(coMatrix, normalizerMatrix) {
+function normalizeCoMatrix(coMatrix: InputMatrix, normalizerMatrix: InputMatrix):InputMatrix {
   return math.dotDivide(coMatrix, normalizerMatrix);
 }
 
@@ -33,7 +33,7 @@ function normalizeCoMatrix(coMatrix, normalizerMatrix) {
  * @param {number} numItems The number of items which have been rated.
  * @returns {array} An array of indices noting what games which have been rated.
  */
-function getRatedItemsForUser(ratings, userIndex, numItems) {
+function getRatedItemsForUser(ratings: InputMatrix, userIndex: number, numItems: number):InputMatrix {
   const ratedItems = [];
   for (let index = 0; index < numItems; index += 1) {
     if (ratings[userIndex][index] !== 0) {
@@ -43,15 +43,7 @@ function getRatedItemsForUser(ratings, userIndex, numItems) {
   return ratedItems;
 }
 
-function typeCheckRatings(ratings) {
-  if (!Array.isArray(ratings)) {
-    throw new TypeError('The ratings and coMatrix field should be an array of arrays (matrix)');
-  }
-}
-
-
-
-function typeCheckUserIndex(userIndex, ratings) {
+function typeCheckUserIndex(userIndex:number, ratings:InputMatrix) {
   if (!Number.isInteger(userIndex)) {
     throw new TypeError('The field userIndex should be an integer');
   }
@@ -60,7 +52,7 @@ function typeCheckUserIndex(userIndex, ratings) {
   }
 }
 
-function checkRatingValues(ratingMatrix) {
+function checkRatingValues(ratingMatrix: InputMatrix):boolean {
   const allowedRatings = [0, 1];
   ratingMatrix.forEach((value) => {
     if ((!Number.isInteger(value)) || (!allowedRatings.includes(value))) {
@@ -81,8 +73,7 @@ function checkRatingValues(ratingMatrix) {
  * @returns {array} An array of item indices sorted in how much well recommended
  * the item is.
  */
-function getRecommendations(ratings, coMatrix, userIndex) {
-  typeCheckRatings(ratings);
+function getRecommendations(ratings: InputMatrix, coMatrix: InputMatrix, userIndex:number):InputMatrix {
   let ratingsMatrix;
   try {
     ratingsMatrix = math.matrix(ratings);
@@ -95,7 +86,7 @@ function getRecommendations(ratings, coMatrix, userIndex) {
 
   const ratedItemsForUser = getRatedItemsForUser(ratings, userIndex, numItems);
   const numRatedItems = ratedItemsForUser.length;
-  const similarities:typeof math.Matrix = math.zeros(numRatedItems, numItems);
+  const similarities:InputMatrix = math.zeros(numRatedItems, numItems);
   for (let rated = 0; rated < numRatedItems; rated += 1) {
     for (let item = 0; item < numItems; item += 1) {
       similarities.set([rated, item], coMatrix.get([ratedItemsForUser[rated], item])
@@ -104,7 +95,7 @@ function getRecommendations(ratings, coMatrix, userIndex) {
   }
 
   // Sum of each row in similarity matrix becomes one row:
-  let recommendations:typeof math.Matrix = math.zeros(numItems);
+  let recommendations:InputMatrix = math.zeros(numItems);
   for (let y = 0; y < numRatedItems; y += 1) {
     for (let x = 0; x < numItems; x += 1) {
       recommendations.set([x], recommendations.get([x]) + similarities.get([y, x]));
@@ -139,9 +130,7 @@ function getRecommendations(ratings, coMatrix, userIndex) {
  * being the number of items that have received at least one rating. The
  * diagonal from left to right should consist of only zeroes.
  */
-function createCoMatrix(ratings) {
-  // We create the ratings matrix to ensure we have correct dimensions
-  typeCheckRatings(ratings);
+function createCoMatrix(ratings:InputMatrix):InputMatrix {
   let ratingsMatrix;
   try {
     ratingsMatrix = math.matrix(ratings);
@@ -198,7 +187,7 @@ function createCoMatrix(ratings) {
  * @returns {array} A two-dimensional array for the normalized co occurrence
  * matrix
  */
-export function collaborativeFilter(ratings, userIndex) {
+export function collaborativeFilter(ratings:InputMatrix, userIndex:number):InputMatrix {
   if (!Array.isArray(ratings)) return false;
 
   const coMatrix = createCoMatrix(ratings);
