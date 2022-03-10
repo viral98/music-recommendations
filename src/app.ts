@@ -1,9 +1,11 @@
 import express from 'express';
 import { collaborativeFilter } from './cf';
+import { FetchSongs } from './fetchSongs';
 const app = express();
 const port = 3000;
 
 app.get('/', (req, res) => {
+    FetchSongs()
     const ratings = [
         [1, 1, 1],
         [1, 0, 1],
