@@ -10,18 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FetchSongs = void 0;
+const spotify_web_api_ts_1 = require("spotify-web-api-ts");
 const constants_1 = require("./constants");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
 function FetchSongs() {
     return __awaiter(this, void 0, void 0, function* () {
-        const result = yield axios
-            .get((0, constants_1.SPOTIFY_PLAYLIST_TO_SONG_URL)(constants_1.DUMMY_PLAYLIST_ID), {
-            headers: {
-                'Authorization': `Bearer ${constants_1.SPOTIFY_TOKEN}`
-            }
-        });
-        console.log(result);
+        const spotify = new spotify_web_api_ts_1.SpotifyWebApi({ accessToken: constants_1.SPOTIFY_TOKEN });
+        const result = yield spotify.playlists.getPlaylist(constants_1.DUMMY_PLAYLIST_ID);
+        const songData = yield spotify.tracks.getAudioFeaturesForTracks(result.tracks.items.map((e) => e.track.id));
+        console.log(songData);
     });
 }
 exports.FetchSongs = FetchSongs;
