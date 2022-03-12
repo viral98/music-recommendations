@@ -5,7 +5,7 @@ const app = express();
 const port = 3000;
 
 app.get('/', (req, res) => {
-    FetchSongs()
+    const songData = FetchSongs()
     const ratings = [
         [1, 1, 1],
         [1, 0, 1],

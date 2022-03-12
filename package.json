@@ -30,6 +30,7 @@
     "axios": "^0.26.1",
     "dotenv": "^16.0.0",
     "express": "^4.17.1",
-    "mathjs": "^10.1.1"
+    "mathjs": "^10.1.1",
+    "spotify-web-api-ts": "^1.4.5"
   }
 }
