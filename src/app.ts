@@ -4,16 +4,10 @@ import { FetchSongs } from './fetchSongs';
 const app = express();
 const port = 3000;
 
-app.get('/', (req, res) => {
-    const songData = FetchSongs()
-    const ratings = [
-        [1, 1, 1],
-        [1, 0, 1],
-        [1, 0, 0],
-       ];
-    const result = collaborativeFilter(ratings, 2);
-
-  res.send(result);
+app.get('/', async (req, res) => {
+    const songData = await FetchSongs()  
+    const result = collaborativeFilter(songData, 2);
+    res.send(result);
 });
 
 app.listen(port, () => {

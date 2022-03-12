@@ -1,4 +1,5 @@
 import { SpotifyWebApi } from 'spotify-web-api-ts';
+import { InputMatrix } from './cf';
 
 import { SPOTIFY_PLAYLIST_TO_SONG_URL, DUMMY_PLAYLIST_ID, SPOTIFY_TOKEN } from "./constants"
 
@@ -13,5 +14,8 @@ export async function FetchSongs(){
 
   
   const songData = await spotify.tracks.getAudioFeaturesForTracks(result.tracks.items.map((e) =>  e.track.id))
-  return songData
+  const resultantMatrix:InputMatrix = songData.map((e)=>(
+    [e.acousticness, e.tempo, e.energy, e.liveness, e.loudness, e.speechiness]
+  ))
+  return resultantMatrix
 }

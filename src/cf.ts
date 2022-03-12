@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const math = require('mathjs');
 
-type InputMatrix = typeof math.Matrix
+export type InputMatrix = typeof math.Matrix
 /*
   * If you put this to 0, you will get recommendations from users which don't necessarily have
   * similar taste as you (these will however be lower ranked than recommendations from people
