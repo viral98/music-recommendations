@@ -50,12 +50,6 @@ function typeCheckUserIndex(userIndex, ratings) {
     }
 }
 function checkRatingValues(ratingMatrix) {
-    const allowedRatings = [0, 1];
-    ratingMatrix.forEach((value) => {
-        if ((!Number.isInteger(value)) || (!allowedRatings.includes(value))) {
-            throw new TypeError('Wrong rating in rating array. Currently permitted values are 0 and 1');
-        }
-    });
     return true;
 }
 // Global API functions
@@ -171,6 +165,7 @@ function createCoMatrix(ratings) {
  * matrix
  */
 function collaborativeFilter(ratings, userIndex) {
+    console.log("Ratings inside collaborative filter", ratings);
     if (!Array.isArray(ratings))
         return false;
     const coMatrix = createCoMatrix(ratings);

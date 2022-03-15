@@ -14,12 +14,16 @@ const spotify_web_api_ts_1 = require("spotify-web-api-ts");
 const constants_1 = require("./constants");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
+const raccoon = require('raccoon_v0125');
 function FetchSongs() {
     return __awaiter(this, void 0, void 0, function* () {
         const spotify = new spotify_web_api_ts_1.SpotifyWebApi({ accessToken: constants_1.SPOTIFY_TOKEN });
         const result = yield spotify.playlists.getPlaylist(constants_1.DUMMY_PLAYLIST_ID);
         const songData = yield spotify.tracks.getAudioFeaturesForTracks(result.tracks.items.map((e) => e.track.id));
-        console.log(songData);
+        const resultantMatrix = songData.map((e, index) => __awaiter(this, void 0, void 0, function* () {
+            return (yield raccoon.liked(index, [e.acousticness, e.tempo, e.energy, e.liveness, e.loudness, e.speechiness]));
+        }));
+        return yield raccoon.recommendFor(3, 10);
     });
 }
 exports.FetchSongs = FetchSongs;
