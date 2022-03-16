@@ -6,6 +6,7 @@ const port = 3000;
 
 app.get('/', async (req, res) => {
     const songData = await FetchSongs()  
+    console.log(songData);
     const result = collaborativeFilter(songData, 2);
     res.send(result);
 });
