@@ -30,9 +30,13 @@ export async function FetchSongs(){
   // 5. Valence: Positiveness conveyed in the track. Higher values indicate the
   //             track is happy, cheerful, euphoric while lower values indicate
   //             the track is negative e.g. sad, depressed, angry.
-  // Note that some of the selected attributes are either intentionally
-  // complementary or have similarities, this is to surface outliers and allow
-  // for an unbiased representation.
+  // Features are modelled such that each value in the 0-1 input matrix represents
+  // a custom defined range for these features. Feature values are normalized and
+  // represented in this manner because the CF implementation only accepts a 0-1
+  // matrix -- the raw feature values usually have a range associated. Note that
+  // some of the selected attributes are either intentionally complementary or
+  // have similarities, this is to surface outliers and allow for an unbiased
+  // representation.
   //
   // See https://developer.spotify.com/documentation/web-api/reference/#/operations/get-several-audio-features
   const resultantMatrix:InputMatrix = songData.map((e)=>(
