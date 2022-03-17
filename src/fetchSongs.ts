@@ -1,10 +1,8 @@
 import { SpotifyWebApi } from 'spotify-web-api-ts';
 import { InputMatrix } from './cf';
 
-import { SPOTIFY_PLAYLIST_TO_SONG_URL, DUMMY_PLAYLIST_ID, SPOTIFY_TOKEN } from "./constants"
+import { DUMMY_PLAYLIST_ID, SPOTIFY_TOKEN } from "./constants"
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const axios = require('axios')
 
 export async function FetchSongs(){
   
