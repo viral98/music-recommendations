@@ -1,12 +1,11 @@
 import { SpotifyWebApi } from 'spotify-web-api-ts';
 import { InputMatrix } from './cf';
 
-import { DUMMY_PLAYLIST_ID } from "./constants"
 
 
-export async function FetchSongs(spotify: SpotifyWebApi){
+export async function FetchSongs(spotify: SpotifyWebApi, playlist_id: string){
 
-  const result = await spotify.playlists.getPlaylist(DUMMY_PLAYLIST_ID);
+  const result = await spotify.playlists.getPlaylist(playlist_id);
 
   
   const songData = await spotify.tracks.getAudioFeaturesForTracks(
