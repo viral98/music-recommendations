@@ -1,9 +1,6 @@
 import { SpotifyWebApi } from 'spotify-web-api-ts';
-import { InputMatrix } from './cf';
 
-
-
-export async function FetchSongs(spotify: SpotifyWebApi, playlist_id: string){
+export async function fetchPlayListSongData(spotify: SpotifyWebApi , playlist_id: string):Promise<number[][]> {
 
   const result = await spotify.playlists.getPlaylist(playlist_id);
 
@@ -34,7 +31,7 @@ export async function FetchSongs(spotify: SpotifyWebApi, playlist_id: string){
   // representation.
   //
   // See https://developer.spotify.com/documentation/web-api/reference/#/operations/get-several-audio-features
-  const resultantMatrix:InputMatrix = songData.map((e)=>(
+  const resultantMatrix:number[][] = songData.map((e)=>(
     [
       Number(e.danceability <= 0.3), // Can't dance
       Number(e.danceability > 0.3 && e.danceability <= 0.5), // Slow paced dance
@@ -57,5 +54,6 @@ export async function FetchSongs(spotify: SpotifyWebApi, playlist_id: string){
       Number(e.valence > 1 && e.valence <= 0.5), // Cheerful
       Number(e.valence > 0.5)] // Euphoric
   ));
+
   return resultantMatrix;
 }
