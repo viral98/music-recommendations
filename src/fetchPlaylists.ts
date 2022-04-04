@@ -24,7 +24,11 @@ export async function fetchPlaylists (spotify: SpotifyWebApi, playlist_ids: stri
     }
   )
 
-  console.log(allSongData)
+  allSongData.push([
+    0, 0, 0, 1, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 1
+  ])
   return allSongData
   
 }
