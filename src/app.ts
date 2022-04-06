@@ -1,18 +1,20 @@
 import express from 'express';
 import { collaborativeFilter } from './cf';
-import { FetchSongs } from './fetchSongs';
 import { SpotifyWebApi } from 'spotify-web-api-ts';
 import { DUMMY_PLAYLIST_ID, SPOTIFY_TOKEN } from './constants';
+import { fetchPlaylists } from './fetchPlaylists';
 const app = express();
 const port = 3000;
 
 app.get('/', async (req, res) => {
-    const spotify = new SpotifyWebApi({ accessToken: SPOTIFY_TOKEN });
-    const songData = await FetchSongs(spotify)
-    const result = collaborativeFilter(songData, 2);
-    const playListData = await spotify.playlists.getPlaylist(DUMMY_PLAYLIST_ID);
-    const commonLikings = playListData.tracks.items.map((e) => e.track.name).filter((value, index) => result.includes(index))
-    res.send(commonLikings);
+  const spotify = new SpotifyWebApi({ accessToken: SPOTIFY_TOKEN });
+  const songData = await fetchPlaylists(spotify, DUMMY_PLAYLIST_ID);
+  console.log(songData[songData.length -1])
+  const result = collaborativeFilter(songData, songData.length - 1 );
+  // console.log(result)
+  // const playListData = await spotify.playlists.getPlaylist(DUMMY_PLAYLIST_ID[0]);
+  // const commonLikings = playListData.tracks.items.map((e) => e.track.name).filter((value, index) => result.includes(index))
+  res.send(result);
 });
 
 app.listen(port, () => {

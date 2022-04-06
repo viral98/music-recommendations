@@ -191,6 +191,7 @@ export function collaborativeFilter(ratings:InputMatrix, userIndex:number):Input
   if (!Array.isArray(ratings)) return false;
 
   const coMatrix = createCoMatrix(ratings);
+  console.log(coMatrix)
   const recommendations = getRecommendations(ratings, coMatrix, userIndex);
   return recommendations;
 }
