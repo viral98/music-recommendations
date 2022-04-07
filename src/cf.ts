@@ -192,5 +192,7 @@ export function collaborativeFilter(ratings:InputMatrix, userIndex:number):Input
 
   const coMatrix = createCoMatrix(ratings);
   const recommendations = getRecommendations(ratings, coMatrix, userIndex);
+  console.log(recommendations);
+  
   return recommendations;
 }
