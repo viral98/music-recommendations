@@ -7,9 +7,8 @@ const similarity = require( 'compute-cosine-similarity' );
  * @returns The cosine similarity of the songs recommended by CF
  */
 export function getCosineSimilarities(listOfRecommendationsWithAttributes: number[][]):number{
-  // console.log("dim f matrix is: " + listOfRecommendationsWithAttributes.length + "x" +listOfRecommendationsWithAttributes[0].length)
   let cosineSimilaritiesOfAllReccomendations = 0;
-  let size = listOfRecommendationsWithAttributes.length;
+  const size = listOfRecommendationsWithAttributes.length;
   for (let i = 0; i < size; i++) {
     for (let j = i + 1; j < size; j++) {
       if (j == size) continue;
@@ -32,7 +31,7 @@ export function getCosineSimilarities(listOfRecommendationsWithAttributes: numbe
  */
 export function getInterCosineSimilarities(matrixA: number[][], matrixB: number[][]) {
   let cosineSimilaritiesOfAllReccomendations = 0;
-  let sizeA = matrixA.length,
+  const sizeA = matrixA.length,
       sizeB = matrixB.length;
   for (let i = 0; i < sizeA; i++) {
     for (let j = i + 1; j < sizeA; j++) {

@@ -173,9 +173,6 @@ export async function getRecomFeatures(spotify: SpotifyWebApi, recomSongData) {
 }
 
 export async function GetNewRecommendations(likingMatrix) {
-  // console.log("playList data is: ")
-  // console.log(playlistData)
-
   const attributes = evaluateAttributes(likingMatrix);
 
   const artistData = [];
@@ -192,22 +189,11 @@ export async function GetNewRecommendations(likingMatrix) {
         {'name' : `${index}`, 'id' : playlistData[song].track.artists[0].id, 'count' : 1 } : 
         {'name' : `${index}`, 'id' : playlistData[song].track.artists[0].id, 'count' : artistData[index].count + 1};
   }
-    // RECORD TYPE ?
-  //   let artistRecord : Record<string, number> = {};
-  //   for (const song in playlistData) {
-  //     let index = playlistData[song].track.artists[0].name;
-  //     index = `${index}`;
-  //     index in artistRecord ? artistRecord[index] = artistRecord[index] + 1 : artistRecord[index] = 1;
-  // }
-  // console.log("record type has: ")
-  // console.log(artistRecord)
+
 
   artistSort = Object.entries(artistData).sort(function(a, b){
     return b[1].count - a[1].count;
-  })
-// console.log("artistSort : ");
-// console.log(artistSort);
-;
+  });
 
   const config = {
     headers: {
@@ -219,18 +205,7 @@ export async function GetNewRecommendations(likingMatrix) {
 
   const data = await axios.get(`https://api.spotify.com/v1/artists/${artistSort[0][1].id}`, config)
     .catch(function (error) {
-      if (error.response) {
-        // Request made and server responded
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message);
-      }
+     console.error(error)
     })
     .then(async res => {
       genreData = res.data.genres;
@@ -247,16 +222,18 @@ async function generateRecommendatins(genre, artist, attributes) {
   for (let k = 0; k < 2 && k < genre.length; k++) {
     genre[k] = genre[k].split(' ').join('+');
     if (genres.length === 0) genres = genre[k];
-    else genres = genres + "%2C" + genre[k];
+    else if(genre[k] != "dance+pop" ) genres + "%2C" + genre[k];
   }
-  console.log(genres);
-  console.log(artist);
+  
+  if(genres == "dance+pop"){
+    genres = "pop%2Cdance"
+  }
 
   // attributes from CF
   const targetAttributes = `target_danceability=${attributes.danceability}&target_energy=${attributes.energy}` +
   `&target_instrumentalness=${attributes.instrumentalness}&target_speechiness=${attributes.speechiness}` +
     `&target_valence=${attributes.valence}`;
-  let data =  await spotifyCall(DUMMY_PLAYLIST_ID, genres, artist.id, targetAttributes);
+  const data =  await spotifyCall(DUMMY_PLAYLIST_ID, genres, artist.id, targetAttributes);
   
   return data;
 }
@@ -269,32 +246,14 @@ async function spotifyCall(playlistId, genres, artistId, targetAttributes) { // 
       'Authorization': `Bearer ${process.env.SPOTIFY_KEY}`
     }
   }
-  // console.log(`id: ${playlistId} \ngenres: ${genres} \nseed artist: ${artistId}`)
-  let axiosGet = `https://api.spotify.com/v1/recommendations?seed_tracks=${playlistId[0]}&seed_genres=${genres}&seed_artist=${artistId}&${targetAttributes}&limit=5`
-  console.log("axiosGet is : -------------------------")
-  console.log(axiosGet)
-  let recomms = await axios.get(axiosGet, config)
+  const axiosGet = `https://api.spotify.com/v1/recommendations?seed_tracks=${playlistId[0]}&seed_genres=${genres}&seed_artist=${artistId}&${targetAttributes}&limit=5`
+
+  const recomms = await axios.get(axiosGet, config)
   .catch(function (error) {
-    if (error.response) {
-      // Request made and server responded
-      console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.log(error.request);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log('Error', error.message);
-    }
+    console.error(error)
   })
   .then(res => {
-    // console.log(res.data);
-    // console.log("tracks are: ")
-    // console.log(res.data.tracks);
-    for (const song of res.data.tracks) {
-      console.log(song.name + ", " + song.artists[0].name)
-    }
+    
     return res.data.tracks;
   })
   
@@ -338,10 +297,7 @@ function evaluateAttributes(likingMatrix) {
       }
     }
   }
-  console.log("attributes generated are: ");
-  console.log(attributes);
 
-  // return 5 attributes as an array.
   return attributes;
 }
 
