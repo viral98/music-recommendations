@@ -253,9 +253,9 @@ async function generateRecommendatins(genre, artist, attributes) {
   console.log(artist);
 
   // attributes from CF
-  const targetAttributes = `target_danceability=${attributes.danceability}&target_energ=${attributes.energy}` +
-  `target_instrumentalness=${attributes.instrumentalness}&target_speechiness=${attributes.speechiness}` +
-    `target_valence=${attributes.valence}`;
+  const targetAttributes = `target_danceability=${attributes.danceability}&target_energy=${attributes.energy}` +
+  `&target_instrumentalness=${attributes.instrumentalness}&target_speechiness=${attributes.speechiness}` +
+    `&target_valence=${attributes.valence}`;
   let data =  await spotifyCall(DUMMY_PLAYLIST_ID, genres, artist.id, targetAttributes);
   
   return data;
@@ -270,8 +270,10 @@ async function spotifyCall(playlistId, genres, artistId, targetAttributes) { // 
     }
   }
   // console.log(`id: ${playlistId} \ngenres: ${genres} \nseed artist: ${artistId}`)
-
-  let recomms = await axios.get(`https://api.spotify.com/v1/recommendations?seed_tracks=${playlistId[0]}&seed_genres=${genres}&seed_artist=${artistId}&limit=5`, config)
+  let axiosGet = `https://api.spotify.com/v1/recommendations?seed_tracks=${playlistId[0]}&seed_genres=${genres}&seed_artist=${artistId}&${targetAttributes}&limit=5`
+  console.log("axiosGet is : -------------------------")
+  console.log(axiosGet)
+  let recomms = await axios.get(axiosGet, config)
   .catch(function (error) {
     if (error.response) {
       // Request made and server responded
