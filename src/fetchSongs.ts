@@ -1,10 +1,10 @@
 import { SpotifyWebApi } from 'spotify-web-api-ts';
-import { InputMatrix } from './cf';
 import { DUMMY_PLAYLIST_ID } from "./constants"
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
 
-let playlistData = [];
+const playlistData = [];
 
 export const attributesMap = {
   "0": {
@@ -178,7 +178,7 @@ export async function GetNewRecommendations(likingMatrix) {
 
   const attributes = evaluateAttributes(likingMatrix);
 
-  let artistData = [];
+  const artistData = [];
   let artistSort = {};
   let genreData = {};
 
@@ -217,7 +217,7 @@ export async function GetNewRecommendations(likingMatrix) {
     }
   }
 
-  let data = await axios.get(`https://api.spotify.com/v1/artists/${artistSort[0][1].id}`, config)
+  const data = await axios.get(`https://api.spotify.com/v1/artists/${artistSort[0][1].id}`, config)
     .catch(function (error) {
       if (error.response) {
         // Request made and server responded
@@ -234,7 +234,7 @@ export async function GetNewRecommendations(likingMatrix) {
     })
     .then(async res => {
       genreData = res.data.genres;
-      let data = await generateRecommendatins(genreData, artistSort[0][1], attributes);
+      const data = await generateRecommendatins(genreData, artistSort[0][1], attributes);
       return data;
     })  
     return data;
@@ -303,7 +303,7 @@ async function spotifyCall(playlistId, genres, artistId, targetAttributes) { // 
 
 // Method to calculate attribute vallues based on CF calculations.
 function evaluateAttributes(likingMatrix) {
-  let attributes = {
+  const attributes = {
     'danceability' : 0,
     'energy' : 0,
     'instrumentalness' : 0,
@@ -315,7 +315,7 @@ function evaluateAttributes(likingMatrix) {
 
   // evaluate attributes here, find best vallues for 5 attrs.
   for (const val of likingMatrix) {
-    let attributeNumber = Math.floor(val/4);
+    const attributeNumber = Math.floor(val/4);
     if (attributeNumber === 0) {
       if (attributes.danceability === 0) {
         attributes.danceability = Number((attributesMap[val].ulimit - attributesMap[val].llimit / 2).toFixed(2));
@@ -368,7 +368,7 @@ function generateBinnedMatrix(songData) {
       Number(e.valence > 0.3 && e.valence <= 0.5), // Sad
       Number(e.valence > 0.5 && e.valence <= 0.7), // Cheerful
       Number(e.valence > 0.7)] // Euphoric
-  ));;
+  ));
   return result;
 }
 
