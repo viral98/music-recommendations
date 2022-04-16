@@ -1,10 +1,17 @@
 import { SpotifyWebApi } from 'spotify-web-api-ts';
+import { attributesMap, DUMMY_PLAYLIST_ID } from "./constants"
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
+
+const playlistData = [];
+
+
 
 export async function fetchPlayListSongData(spotify: SpotifyWebApi , playlist_id: string):Promise<number[][]> {
-
   const result = await spotify.playlists.getPlaylist(playlist_id);
+  result.tracks.items.forEach((item) => playlistData.push(item))
 
-  
   const songData = await spotify.tracks.getAudioFeaturesForTracks(
     result.tracks.items.map((e) =>  e.track.id));
   // Taking into consideration the following features from songs:
@@ -31,7 +38,149 @@ export async function fetchPlayListSongData(spotify: SpotifyWebApi , playlist_id
   // representation.
   //
   // See https://developer.spotify.com/documentation/web-api/reference/#/operations/get-several-audio-features
-  const resultantMatrix:number[][] = songData.map((e)=>(
+  const resultantMatrix:number[][] = generateBinnedMatrix(songData);
+
+  return resultantMatrix;
+}
+
+export async function getRecomFeatures(spotify: SpotifyWebApi, recomSongData) {
+  const recomFeatures = await spotify.tracks.getAudioFeaturesForTracks(
+    recomSongData.map((e) => e.id));
+    const recomMatrix = generateBinnedMatrix(recomFeatures);
+    return recomMatrix;
+}
+
+export async function GetNewRecommendations(likingMatrix) {
+  const attributes = evaluateAttributes(likingMatrix);
+
+  const artistData = [];
+  let artistSort = {};
+  let genreData = {};
+
+  // count ocuurence of each artist + genre from EACH song
+  for (const song in playlistData) {
+    let index = playlistData[song].track.artists[0].name;
+    index = `${index}`;
+    artistSort[index] = (typeof artistSort[index] === 'undefined')? 1 : artistSort[index] + 1;
+    artistData[index] = 
+      (typeof artistData[index] === 'undefined')? 
+        {'name' : `${index}`, 'id' : playlistData[song].track.artists[0].id, 'count' : 1 } : 
+        {'name' : `${index}`, 'id' : playlistData[song].track.artists[0].id, 'count' : artistData[index].count + 1};
+  }
+
+
+  artistSort = Object.entries(artistData).sort(function(a, b){
+    return b[1].count - a[1].count;
+  });
+
+  const config = {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.SPOTIFY_KEY}`
+    }
+  }
+
+  const data = await axios.get(`https://api.spotify.com/v1/artists/${artistSort[0][1].id}`, config)
+    .catch(function (error) {
+     console.error(error)
+    })
+    .then(async res => {
+      genreData = res.data.genres;
+      const data = await generateRecommendatins(genreData, artistSort[0][1], attributes);
+      return data;
+    })  
+    return data;
+}
+
+async function generateRecommendatins(genre, artist, attributes) {
+
+  // feed genre
+  let genres = "";
+  for (let k = 0; k < 2 && k < genre.length; k++) {
+    genre[k] = genre[k].split(' ').join('+');
+    if (genres.length === 0) genres = genre[k];
+    else if(genre[k] != "dance+pop" ) genres + "%2C" + genre[k];
+  }
+  
+  if(genres == "dance+pop"){
+    genres = "pop%2Cdance"
+  }
+
+  // attributes from CF
+  const targetAttributes = `target_danceability=${attributes.danceability}&target_energy=${attributes.energy}` +
+  `&target_instrumentalness=${attributes.instrumentalness}&target_speechiness=${attributes.speechiness}` +
+    `&target_valence=${attributes.valence}`;
+  const data =  await spotifyCall(DUMMY_PLAYLIST_ID, genres, artist.id, targetAttributes);
+  
+  return data;
+}
+
+async function spotifyCall(playlistId, genres, artistId, targetAttributes) { // rename function
+  const config = {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.SPOTIFY_KEY}`
+    }
+  }
+  const axiosGet = `https://api.spotify.com/v1/recommendations?seed_tracks=${playlistId[0]}&seed_genres=${genres}&seed_artist=${artistId}&${targetAttributes}&limit=5`
+
+  const recomms = await axios.get(axiosGet, config)
+  .catch(function (error) {
+    console.error(error)
+  })
+  .then(res => {
+    
+    return res.data.tracks;
+  })
+  
+  return recomms;
+}
+
+// Method to calculate attribute vallues based on CF calculations.
+function evaluateAttributes(likingMatrix) {
+  const attributes = {
+    'danceability' : 0,
+    'energy' : 0,
+    'instrumentalness' : 0,
+    'speechiness' : 0,
+    'valence' : 0
+  }
+
+  // console.log(likingMatrix); // works
+
+  // evaluate attributes here, find best vallues for 5 attrs.
+  for (const val of likingMatrix) {
+    const attributeNumber = Math.floor(val/4);
+    if (attributeNumber === 0) {
+      if (attributes.danceability === 0) {
+        attributes.danceability = Number((attributesMap[val].ulimit - attributesMap[val].llimit / 2).toFixed(2));
+      }
+    }    if (attributeNumber === 1) {
+      if (attributes.energy === 0) {
+        attributes.energy = Number((attributesMap[val].ulimit - attributesMap[val].llimit / 2).toFixed(2));
+      }
+    }    if (attributeNumber === 2) {
+      if (attributes.instrumentalness === 0) {
+        attributes.instrumentalness = Number((attributesMap[val].ulimit - attributesMap[val].llimit / 2).toFixed(2));
+      }
+    }    if (attributeNumber === 3) {
+      if (attributes.speechiness === 0) {
+        attributes.speechiness = Number((attributesMap[val].ulimit - attributesMap[val].llimit / 2).toFixed(2));
+      }
+    }    if (attributeNumber === 4) {
+      if (attributes.valence === 0) {
+        attributes.valence = Number((attributesMap[val].ulimit - attributesMap[val].llimit / 2).toFixed(2));
+      }
+    }
+  }
+
+  return attributes;
+}
+
+function generateBinnedMatrix(songData) {
+  const result = songData.map((e)=>(
     [
       Number(e.danceability <= 0.3), // Can't dance
       Number(e.danceability > 0.3 && e.danceability <= 0.5), // Slow paced dance
@@ -49,11 +198,15 @@ export async function fetchPlayListSongData(spotify: SpotifyWebApi , playlist_id
       Number(e.speechiness > 0.3 && e.speechiness <= 0.5), // Few rap parts
       Number(e.speechiness > 0.5 && e.speechiness <= 0.7), // Lots of spoken words
       Number(e.speechiness > 0.7), // Rap music
-      Number(e.valence <= -0.5), // Depressed, Angry
-      Number(e.valence > -0.5 && e.valence <= 1), // Sad
-      Number(e.valence > 1 && e.valence <= 0.5), // Cheerful
-      Number(e.valence > 0.5)] // Euphoric
+      Number(e.valence <= 0.3), // Depressed, Angry
+      Number(e.valence > 0.3 && e.valence <= 0.5), // Sad
+      Number(e.valence > 0.5 && e.valence <= 0.7), // Cheerful
+      Number(e.valence > 0.7)] // Euphoric
   ));
-
-  return resultantMatrix;
+  return result;
 }
+
+// https://open.spotify.com/playlist/37i9dQZF1DXbck8sFsEQGj?si=a43a4222cc1a413a // indian geres
+
+// https://open.spotify.com/playlist/37i9dQZF1E38GzV4rvBzBp?si=6ce668edd3814a8f Daily playlist 1 - TS
+// https://open.spotify.com/playlist/37i9dQZF1DX4OzrY981I1W?si=c0bf37d19c1640cb // movie playlist -> art pop and dance pop error
