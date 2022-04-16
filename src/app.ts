@@ -20,7 +20,7 @@ app.get('/', async (req, res) => {
   const recomMatrix = await getRecomFeatures(spotify, recommendationData);
 
   const blendMatrix = await fetchPlaylists(spotify, BLEND_PLAYLIST_ID);
-  const finalRecommendation = `\nIntra-list similarity of our Algorithm is: ${getCosineSimilarities(recomMatrix).toFixed(5)}` + `\nInter-List similarity (Spotify-Generated Blend Playlist) is: ${getInterCosineSimilarities(recomMatrix, blendMatrix).toFixed(5)}`
+  const finalRecommendation = `\nIntra-list similarity of our Algorithm is: ${getCosineSimilarities(recomMatrix).toFixed(5)}` + `\nInter-List similarity (Spotify-Generated Blend Playlist) is: ${getCosineSimilarities( blendMatrix).toFixed(5)}`
   res.send(finalRecommendation);
 });
 
