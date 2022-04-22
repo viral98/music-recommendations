@@ -107,6 +107,10 @@ async function generateRecommendatins(genre, artist, attributes) {
     genres = "pop%2Cdance"
   }
 
+  console.log("genres: " + genres);
+  console.log("artist: ");
+  console.log(artist);
+
   // attributes from CF
   const targetAttributes = `target_danceability=${attributes.danceability}&target_energy=${attributes.energy}` +
   `&target_instrumentalness=${attributes.instrumentalness}&target_speechiness=${attributes.speechiness}` +

@@ -18,7 +18,7 @@ export function getCosineSimilarities(listOfRecommendationsWithAttributes: numbe
       );
     }
   }
-  const averageCosineSimilarity = cosineSimilaritiesOfAllReccomendations / 45;
+  const averageCosineSimilarity = cosineSimilaritiesOfAllReccomendations / getSummation(size);
 
   return averageCosineSimilarity;
 }
@@ -31,18 +31,24 @@ export function getCosineSimilarities(listOfRecommendationsWithAttributes: numbe
  */
 export function getInterCosineSimilarities(matrixA: number[][], matrixB: number[][]) {
   let cosineSimilaritiesOfAllReccomendations = 0;
-  const sizeA = matrixA.length,
-      sizeB = matrixB.length;
-  for (let i = 0; i < sizeA; i++) {
-    for (let j = i + 1; j < sizeA; j++) {
-      if (j == sizeA) continue;
+  const size = matrixA.length
+  for (let i = 0; i < size; i++) {
+    for (let j = i + 1; j < size; j++) {
+      if (j == size) continue;
       cosineSimilaritiesOfAllReccomendations += similarity(
         matrixA[i],
         matrixB[j]
       );
     }
   }
-  const averageCosineSimilarity = cosineSimilaritiesOfAllReccomendations / 45;
+  const averageCosineSimilarity = cosineSimilaritiesOfAllReccomendations / size * size;
 
-  return averageCosineSimilarity;
+  return averageCosineSimilarity / 10;
+}
+
+function getSummation(number) {
+  if (number === 0) {
+    return 0;
+  }
+  return number + getSummation(number - 1)
 }
