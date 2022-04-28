@@ -1,5 +1,7 @@
 # Music Recommendation for group settings
 
+[![DEMO & PITCH](https://img.youtube.com/vi/2g5iu4FWHhM/0.jpg)](https://www.youtube.com/watch?v=2g5iu4FWHhM)
+
 NOTE - This an academic project, not intended for real world usage, the repository doesn't throw back the list of recommended songs (although it can be modified to do so) but rather serves the difference (cosine) between the input blend and the input playlist(s)
 
 ## Abstract
